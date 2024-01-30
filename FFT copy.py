@@ -1,3 +1,5 @@
+from typing import Optional
+
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -11,9 +13,46 @@ from scipy.fft import fft, fftfreq
 #     "cer_3": [890, 980, 1080, 1180, 1300, 1500, 1630, 1750, 1815, 1950, 2050],
 #     "squ": []
 # }
+M_PER_PIXEL = 2.8e-5
+
+
+def terminate_figure(
+        fig: Optional[plt.Figure] = None,
+        show: bool = True,
+        path_to_save: Optional[str] = None,
+        **kwargs
+) -> None:
+    """
+    Terminates current figure.
+
+    Parameters
+    ----------
+
+    fig : plt.Figure
+        Current figure. If no figure is given, will close the opened figure.
+    show : bool
+        Whether to show figure. Defaults to True
+    path_to_save : Optional[str]
+        Path to save the figure.
+    """
+    if fig is not None:
+        fig.tight_layout()
+
+    if path_to_save is not None:
+        plt.savefig(path_to_save, dpi=kwargs.get('dpi', 300), bbox_inches='tight')
+    if show:
+        plt.show()
+
+    if fig is not None:
+        plt.close(fig)
+    else:
+        plt.close()
 
 
 def find_valleys_from_guess():
+    fig, axes = plt.subplots(2, 2, sharex="row", sharey="all")
+    fig.supxlabel("Distance relative à une origine arbitraire [m]")
+    fig.supylabel("Intensité lumineuse du pixel [-]")
     for experience_type, position in [
         ("dif", (0, 0)),
         ("int", (0, 1)),
@@ -24,15 +63,19 @@ def find_valleys_from_guess():
         file_name = f'/Users/felixdesroches/Downloads/{experience_type}.csv'
         df = pd.read_csv(file_name, sep=',', header=None)[1:].astype(float)
         array = df.to_numpy()
-        plt.plot(array[:, 0], array[:, 1])
-        critical_points = []
+        if experience_type == "cer_3":
+            array = array[:3500, :]
+        axes[position].plot(array[:, 0]*M_PER_PIXEL, array[:, 1])
+        # plt.plot(array[:, 0], array[:, 1])
+        # critical_points = []
         # for guess in guess_dict[experience_type]:
         #     critical_points += [guess -50 + np.argmin(array[guess-50:guess+50, 1])]
         # print(critical_points)
         # for i in critical_points:
         #     plt.plot([i, i], [-10, 10], c="r")
         #     plt.plot([i, i], [-10, 260], c="r")
-        plt.show()
+
+    terminate_figure(fig, False, "/Users/felixdesroches/Desktop/ULaval_labs/PHY_2006_optique/Laboratoires_optique/diffraction/figures")
 
 
 find_valleys_from_guess()
