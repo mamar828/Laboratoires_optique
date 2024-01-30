@@ -85,10 +85,10 @@ def find_peak_distance(mins: list):
 print(f"\n{C.NEGATIVE}Single slit 0.08mm{C.END}")
 find_peak_distance([922, 1238, 1592, 1961, 2319, 2665, 2996, 3631, 3975, 4309, 4653, 4953, 5243, 5575, 5841, 6089])
 
-print(f"\n{C.NEGATIVE}Double slits 0.08mm, distance between slits{C.END}")
+print(f"\n{C.NEGATIVE}Double slits 0.25mm, distance between slits{C.END}")
 find_peak_distance([2593, 2693, 2795, 2891, 2990, 3089, 3185, 3276, 3369, 3466, 3555, 3653, 3745, 
                     3840, 3930, 4019, 4112, 4203, 4289, 4379, 4473, 4553, 4646, 4737, 4827, 4911, 5001, 5108])
-print(f"\n{C.NEGATIVE}Double slits 0.08mm, slit width{C.END}")
+print(f"\n{C.NEGATIVE}Double slits 0.04mm, slit width{C.END}")
 find_peak_distance([503, 1211, 1897, 2593, 5108, 5737, 6265, 6737])
 
 print(f"\n{C.NEGATIVE}Spherical opening 0.2mm, radius{C.END}")
