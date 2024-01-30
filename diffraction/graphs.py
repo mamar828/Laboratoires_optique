@@ -21,7 +21,7 @@ def diffraction_equation(y, a, y_0, I_0, L, lambd):
 
 def get_fitted_diffraction():
 
-    vals = get_csv_data("diffraction/diffraction_beau_avg.csv")
+    vals = get_csv_data("diffraction/data/diffraction_beau_avg.csv")
     # np.savetxt('testi.txt', vals, fmt='%1.3f')
     vals *= np.tile(np.array([m_per_pixel, 1]), (vals.shape[0],1))
 
@@ -33,6 +33,12 @@ def get_fitted_diffraction():
     y_range = np.linspace(0, np.max(vals[:,0]), 10000)
     print(a, y_0, I_0)
     plt.plot(y_range, diffraction_equation(y_range, a, y_0, I_0, L, lambd), "g-", markersize=1)
+    plt.xlabel("position [m]")
+    plt.ylabel("intensité [-]")
+    plt.title("Ajustement de gaussienne sur le patron de diffraction produit avec un avec\nun laser à 650 nm "+
+              "par une ouverture circulaire d'un diamètre de 0.2 mm")
+    plt.savefig("diffraction/figures/fit_attempt.png", dpi=300, bbox_inches="tight")
+
     plt.show()
 
 
@@ -65,7 +71,7 @@ def save_figure(
 #     "intensité [-]",
 #     ("Intensité en fonction de la position dans une figure de diffraction produite\navec un laser à 650 nm "+
 #      "par une ouverture circulaire d'un diamètre de 0.2 mm"),
-#     "diffraction/figures/cer.png"
+#     # "diffraction/figures/cer.png"
 # )
 
 
