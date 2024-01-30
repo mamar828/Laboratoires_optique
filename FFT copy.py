@@ -65,7 +65,7 @@ def find_valleys_from_guess():
         array = df.to_numpy()
         if experience_type == "cer_3":
             array = array[:3500, :]
-        axes[position].plot(array[:, 0]*M_PER_PIXEL, array[:, 1])
+        axes[position].plot(array[:, 0]*M_PER_PIXEL, array[:, 1], linewidth=1)
         # plt.plot(array[:, 0], array[:, 1])
         # critical_points = []
         # for guess in guess_dict[experience_type]:
