@@ -91,5 +91,5 @@ find_peak_distance([2593, 2693, 2795, 2891, 2990, 3089, 3185, 3276, 3369, 3466, 
 print(f"\n{C.NEGATIVE}Double slits 0.08mm, slit width{C.END}")
 find_peak_distance([503, 1211, 1897, 2593, 5108, 5737, 6265, 6737])
 
-print(f"\n{C.NEGATIVE}Spherical opening{C.END}")
+print(f"\n{C.NEGATIVE}Spherical opening 0.2mm, radius{C.END}")
 find_peak_distance([845, 958, 1069, 1159, 1277, 1530, 1627, 1798, 1798, 1932, 2034])
