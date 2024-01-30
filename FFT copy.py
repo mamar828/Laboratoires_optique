@@ -75,7 +75,7 @@ def find_valleys_from_guess():
         #     plt.plot([i, i], [-10, 10], c="r")
         #     plt.plot([i, i], [-10, 260], c="r")
 
-    terminate_figure(fig, False, "/Users/felixdesroches/Desktop/ULaval_labs/PHY_2006_optique/Laboratoires_optique/diffraction/figures")
+    terminate_figure(fig, False, "/Users/felixdesroches/Desktop/ULaval_labs/PHY_2006_optique/Laboratoires_optique/diffraction/figures/subplot_figure.png")
 
 
 find_valleys_from_guess()
