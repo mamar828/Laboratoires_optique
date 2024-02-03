@@ -23,11 +23,15 @@ def get_intensity_increase(noise_filename: str, reference_filename: str) -> unce
     high_low_threshold = 1      # Set the intensity between high and low regimes
     high_data = noise_data[reference_data[:,1] > high_low_threshold]
     low_data = noise_data[reference_data[:,1] < high_low_threshold]
-
-    plt.plot(reference_data[:,0], reference_data[:,1], "ro", markersize=0.5)
-    plt.plot(high_data[:,0], high_data[:,1], "go", markersize=0.5)
-    plt.plot(low_data[:,0], low_data[:,1], "bo", markersize=0.5)
+    fig, axes = plt.subplots(2,1)
+    axes[0].hist(high_data)
+    # axes[1].hist(low_data, bins=10)
     plt.show()
+
+    # plt.plot(reference_data[:,0], reference_data[:,1], "ro", markersize=0.5)
+    # plt.plot(high_data[:,0], high_data[:,1], "go", markersize=0.5)
+    # plt.plot(low_data[:,0], low_data[:,1], "bo", markersize=0.5)
+    # plt.show()
 
     high_val = ufloat(np.nanmean(high_data[:,1]), np.nanstd(high_data[:,1]))
     low_val = ufloat(np.nanmean(low_data[:,1]), np.nanstd(low_data[:,1]))
@@ -62,12 +66,6 @@ def analyze_multiple_csv(data_dir: str) -> Union[uncertainties.core.Variable, np
 
 
 print(f"{analyze_multiple_csv('./data'):.1u}")
-
-
-
-def analyze_multiple_csv():
-    pass
-
 
 
 def make_graph():
