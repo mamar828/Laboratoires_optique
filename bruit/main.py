@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import uncertainties.core
 from uncertainties import ufloat
 from eztcolors import Colors as C
+from matplotlib.lines import Line2D
 
 
 def get_csv_data(filename: str) -> np.ndarray:
@@ -24,21 +25,28 @@ def get_intensity_increase(noise_data: np.ndarray, reference_data: np.ndarray) -
     high_data = noise_data[reference_data[:,1] > high_low_threshold]
     low_data = noise_data[reference_data[:,1] < high_low_threshold]
 
-    plt.plot(reference_data[:,0], reference_data[:,1], "ro", markersize=0.5)
-    plt.plot(high_data[:,0], high_data[:,1], "go", markersize=0.5)
-    plt.plot(low_data[:,0], low_data[:,1], "bo", markersize=0.5)
-    plt.show()
+    plt.plot(reference_data[:,0], reference_data[:,1], "ro", markersize=0.5, label="Signal de référence")
+    plt.plot(high_data[:,0], high_data[:,1], "go", markersize=0.5, label="Régime actif")
+    plt.plot(low_data[:,0], low_data[:,1], "bo", markersize=0.5, label="Régime passif")
+    plt.xlabel("Temps [unités arbitraires]")
+    plt.ylabel("Intensité du signal [V]")
+    plt.title(("Intensité du signal en fonction du temps du signal de référence et du signal \n" + 
+               "étudié permettant la distinction entre le régime actif et le régime passif"))
+    plt.legend(loc="upper left", markerscale=10)
+    plt.savefig("bruit/figures/cropping_example.png", dpi=300, bbox_inches="tight")
+    # plt.show()
 
     high_val = ufloat(np.nanmean(high_data[:,1]), np.nanstd(high_data[:,1]))
     low_val = ufloat(np.nanmean(low_data[:,1]), np.nanstd(low_data[:,1]))
     return high_val / low_val
 
 
-# print(
-#     (f"{C.NEGATIVE}Intensity increase{C.END}: " +
-#     str(get_intensity_increase(noise_filename='bruit/data_deprecated/F0002CH1.CSV', reference_filename='bruit/data_deprecated/F0002CH2.CSV'))
-#     )
-# )
+print(
+    (f"{C.NEGATIVE}Intensity increase{C.END}: " +
+    str(get_intensity_increase(get_csv_data('bruit/data_deprecated/F0002CH1.CSV'), 
+                               get_csv_data('bruit/data_deprecated/F0002CH2.CSV')))
+    )
+)
 
 
 def analyze_multiple_csv(data_dir: str) -> Union[uncertainties.core.Variable, np.ndarray]:
@@ -56,38 +64,61 @@ def analyze_multiple_csv(data_dir: str) -> Union[uncertainties.core.Variable, np
                 if os.path.isfile(os.path.join(data_dir, ref_file_name)) and current_data_patern.match(ref_file_name):
                     reference_data.append(get_csv_data(os.path.join(data_dir, ref_file_name)))
                     noise_data.append(get_csv_data(os.path.join(data_dir, noise_file_name)))
-    summed_spectrum = np.array([np.nansum(noise_data, axis=0), np.nansum(reference_data, axis=0)]) / len(reference_data)
+    summed_spectrum = np.array(
+        [np.nansum(noise_data, axis=0), np.nansum(reference_data, axis=0)]) / len(reference_data)
+    np.save(f"{data_dir}/summed_spectrum.npy", summed_spectrum)
     return get_intensity_increase(*summed_spectrum)
 
 
-print(f"{analyze_multiple_csv('bruit/data'):.1u}")
+# print(f"{analyze_multiple_csv('bruit/data_128'):.1u}")
 
 
 def make_graph():
-    noise_data = get_csv_data("bruit/data/F0004CH1.CSV")
-    reference_data = get_csv_data("bruit/data/F0004CH2.CSV")
+    fig, axs = plt.subplots(2, 2)
+    fig.set_size_inches(10,8)
+    spectrums = [
+        np.stack((get_csv_data("bruit/data/F0004CH1.CSV"), get_csv_data("bruit/data/F0004CH2.CSV"))),
+        np.load("bruit/data_128/summed_spectrum.npy")
+    ]
 
-    high_low_threshold = 1      # Set the intensity between high and low regimes
-    high_data = noise_data[reference_data[:,1] > high_low_threshold]
-    low_data = noise_data[reference_data[:,1] < high_low_threshold]
+    # Set subplot labels
+    for row, col, text in zip([0,0,1,1], [0,1,0,1], ["a)","b)","c)","d)"]):
+        axs[row, col].text(0.1, 0.92, text, fontsize=15, transform=axs[row,col].transAxes)
 
-    fig, axs = plt.subplots(1,2)
-    fig.set_size_inches(10,5)
+    for row_number, spectrum in zip(range(2), spectrums):
+        noise_data = spectrum[0,:,:]
+        reference_data = spectrum[1,:,:]
 
-    fig.supxlabel("Temps [unités arbitraires]")
-    fig.supylabel("Intensité du signal [V]")
-    axs[0].plot(high_data[:70,0], high_data[:70,1], "g-", markersize=0.25, label="Régime actif")
-    axs[0].plot(high_data[70:,0], high_data[70:,1], "g-", markersize=0.25)
-    axs[0].plot(low_data[:1000,0], low_data[:1000,1], "b-", markersize=0.25, label="Régime passif")
-    axs[0].plot(low_data[1000:,0], low_data[1000:,1], "b-", markersize=0.25)
-    axs[0].legend(fontsize=9, loc="upper left")
+        high_low_threshold = 1      # Set the intensity between high and low regimes
+        high_data = noise_data[reference_data[:,1] > high_low_threshold]
+        low_data = noise_data[reference_data[:,1] < high_low_threshold]
 
-    axs[1].hist(low_data[:,1], bins=np.linspace(0.7433,0.7960,10))
-    # axs[1].hist(high_data[:,1], bins=np.linspace(0.7935,))
-    axs[1].hist(high_data[:,1], bins=10)
+        axs[row_number, 0].set_xlabel("Temps [unités arbitraires]")
+        axs[row_number, 0].set_ylabel("Intensité du signal [V]")
+        axs[row_number, 1].set_xlabel("Intensité du signal [V]")
+        axs[row_number, 1].set_ylabel("Nombre de pixels [-]")
+        # fig.supxlabel("Temps [unités arbitraires]")
+        # fig.supylabel("Intensité du signal [V]")
 
-    # plt.savefig()
-    plt.show()
+        axs[row_number, 0].plot(high_data[:70,0], high_data[:70,1], "g-", markersize=0.25, 
+                                label="Régime actif" if row_number else None)
+        axs[row_number, 0].plot(high_data[70:,0], high_data[70:,1], "g-", markersize=0.25)
+        axs[row_number, 0].plot(low_data[:1000,0], low_data[:1000,1], "b-", markersize=0.25, 
+                                label="Régime passif" if row_number else None)
+        axs[row_number, 0].plot(low_data[1000:,0], low_data[1000:,1], "b-", markersize=0.25)
+        # axs[0].plot(high_data[:70,0], high_data[:70,1], "g-", markersize=0.25, label="Régime actif")
+        # axs[0].plot(high_data[72:,0], high_data[72:,1], "g-", markersize=0.25)
+        # axs[0].plot(low_data[2:1000,0], low_data[2:1000,1], "b-", markersize=0.25, label="Régime passif")
+        # axs[0].plot(low_data[1003:,0], low_data[1003:,1], "b-", markersize=0.25)
+        # axs[0].legend(fontsize=9, loc="upper left")
+
+        axs[row_number, 1].hist(high_data[:,1], bins=np.histogram_bin_edges(high_data[:,1], bins="fd"), color="g")
+        axs[row_number, 1].hist(low_data[:,1], bins=np.histogram_bin_edges(low_data[:,1], bins="fd"), color="b")
+        # axs[row_number,0].text(0,0.85,"allo")
+
+    fig.legend(fontsize=9, loc="upper left")
+    plt.savefig("bruit/figures/poisson_law.png", dpi=300, bbox_inches="tight")
+    # plt.show()
 
 
 # make_graph()
