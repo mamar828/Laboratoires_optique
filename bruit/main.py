@@ -25,14 +25,14 @@ def get_intensity_increase(noise_data: np.ndarray, reference_data: np.ndarray) -
     high_data = noise_data[reference_data[:,1] > high_low_threshold]
     low_data = noise_data[reference_data[:,1] < high_low_threshold]
 
-    plt.plot(reference_data[:,0], reference_data[:,1], "ro", markersize=0.5, label="Signal de référence")
+    plt.plot(reference_data[:,0], reference_data[:,1], "ro", markersize=0.5, label="Signal de synchronisation")
     plt.plot(high_data[:,0], high_data[:,1], "go", markersize=0.5, label="Régime actif")
     plt.plot(low_data[:,0], low_data[:,1], "bo", markersize=0.5, label="Régime passif")
     plt.xlabel("Temps [unités arbitraires]")
     plt.ylabel("Intensité du signal [V]")
     plt.title(("Intensité du signal en fonction du temps du signal de référence et du signal \n" + 
                "étudié permettant la distinction entre le régime actif et le régime passif"))
-    plt.legend(loc="upper left", markerscale=10)
+    plt.legend(loc="upper left", markerscale=10, fontsize=9)
     plt.savefig("bruit/figures/cropping_example.png", dpi=300, bbox_inches="tight")
     # plt.show()
 
@@ -41,12 +41,12 @@ def get_intensity_increase(noise_data: np.ndarray, reference_data: np.ndarray) -
     return high_val / low_val
 
 
-# print(
-#     (f"{C.NEGATIVE}Intensity increase{C.END}: " +
-#     str(get_intensity_increase(get_csv_data('bruit/data_deprecated/F0002CH1.CSV'), 
-#                                get_csv_data('bruit/data_deprecated/F0002CH2.CSV')))
-#     )
-# )
+print(
+    (f"{C.NEGATIVE}Intensity increase{C.END}: " +
+    str(get_intensity_increase(get_csv_data('bruit/data_deprecated/F0002CH1.CSV'), 
+                               get_csv_data('bruit/data_deprecated/F0002CH2.CSV')))
+    )
+)
 
 
 def analyze_multiple_csv(data_dir: str) -> Union[uncertainties.core.Variable, np.ndarray]:
@@ -121,4 +121,4 @@ def make_graph():
     # plt.show()
 
 
-make_graph()
+# make_graph()
