@@ -41,12 +41,12 @@ def get_intensity_increase(noise_data: np.ndarray, reference_data: np.ndarray) -
     return high_val / low_val
 
 
-print(
-    (f"{C.NEGATIVE}Intensity increase{C.END}: " +
-    str(get_intensity_increase(get_csv_data('bruit/data_deprecated/F0002CH1.CSV'), 
-                               get_csv_data('bruit/data_deprecated/F0002CH2.CSV')))
-    )
-)
+# print(
+#     (f"{C.NEGATIVE}Intensity increase{C.END}: " +
+#     str(get_intensity_increase(get_csv_data('bruit/data_deprecated/F0002CH1.CSV'), 
+#                                get_csv_data('bruit/data_deprecated/F0002CH2.CSV')))
+#     )
+# )
 
 
 def analyze_multiple_csv(data_dir: str) -> Union[uncertainties.core.Variable, np.ndarray]:
@@ -116,9 +116,9 @@ def make_graph():
         axs[row_number, 1].hist(low_data[:,1], bins=np.histogram_bin_edges(low_data[:,1], bins="fd"), color="b")
         # axs[row_number,0].text(0,0.85,"allo")
 
-    fig.legend(fontsize=9, loc="upper left")
+    fig.legend(fontsize=9, loc="lower center")
     plt.savefig("bruit/figures/poisson_law.png", dpi=300, bbox_inches="tight")
     # plt.show()
 
 
-# make_graph()
+make_graph()
