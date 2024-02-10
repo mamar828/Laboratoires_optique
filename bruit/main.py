@@ -41,12 +41,12 @@ def get_intensity_increase(noise_data: np.ndarray, reference_data: np.ndarray) -
     return high_val / low_val
 
 
-print(
-    (f"{C.NEGATIVE}Intensity increase{C.END}: " +
-    str(get_intensity_increase(get_csv_data('bruit/data_deprecated/F0002CH1.CSV'), 
-                               get_csv_data('bruit/data_deprecated/F0002CH2.CSV')))
-    )
-)
+# print(
+#     (f"{C.NEGATIVE}Intensity increase{C.END}: " +
+#     str(get_intensity_increase(get_csv_data('bruit/data_deprecated/F0002CH1.CSV'), 
+#                                get_csv_data('bruit/data_deprecated/F0002CH2.CSV')))
+#     )
+# )
 
 
 def analyze_multiple_csv(data_dir: str) -> Union[uncertainties.core.Variable, np.ndarray]:
@@ -100,12 +100,12 @@ def make_graph():
         # fig.supxlabel("Temps [unités arbitraires]")
         # fig.supylabel("Intensité du signal [V]")
 
-        axs[row_number, 0].plot(high_data[:70,0], high_data[:70,1], "g-", markersize=0.25, 
+        axs[row_number, 0].plot(high_data[:70,0], high_data[:70,1], "go", markersize=0.25, 
                                 label="Régime actif" if row_number else None)
-        axs[row_number, 0].plot(high_data[70:,0], high_data[70:,1], "g-", markersize=0.25)
-        axs[row_number, 0].plot(low_data[:1000,0], low_data[:1000,1], "b-", markersize=0.25, 
+        axs[row_number, 0].plot(high_data[70:,0], high_data[70:,1], "go", markersize=0.25)
+        axs[row_number, 0].plot(low_data[:1000,0], low_data[:1000,1], "bo", markersize=0.25, 
                                 label="Régime passif" if row_number else None)
-        axs[row_number, 0].plot(low_data[1000:,0], low_data[1000:,1], "b-", markersize=0.25)
+        axs[row_number, 0].plot(low_data[1000:,0], low_data[1000:,1], "bo", markersize=0.25)
         # axs[0].plot(high_data[:70,0], high_data[:70,1], "g-", markersize=0.25, label="Régime actif")
         # axs[0].plot(high_data[72:,0], high_data[72:,1], "g-", markersize=0.25)
         # axs[0].plot(low_data[2:1000,0], low_data[2:1000,1], "b-", markersize=0.25, label="Régime passif")
@@ -116,7 +116,7 @@ def make_graph():
         axs[row_number, 1].hist(low_data[:,1], bins=np.histogram_bin_edges(low_data[:,1], bins="fd"), color="b")
         # axs[row_number,0].text(0,0.85,"allo")
 
-    fig.legend(fontsize=9, loc="lower center")
+    fig.legend(fontsize=9, loc="lower center", markerscale=9)
     plt.savefig("bruit/figures/poisson_law.png", dpi=300, bbox_inches="tight")
     # plt.show()
 
