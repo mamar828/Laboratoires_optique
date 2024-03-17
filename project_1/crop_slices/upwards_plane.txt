@@ -1,0 +1,3 @@
+project_1/video_data/upwards_plane.MP4
+	x_slice: slice(500, 1250, None), 
+	y_slice: slice(50, 800, None)
