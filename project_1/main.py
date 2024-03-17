@@ -1,29 +1,48 @@
 import matplotlib.pyplot as plt
+import os
 
 from video import Video
 
 
 def plot(array, save_filename=None):
-    plot = plt.colorbar(plt.imshow(array, cmap="hot"))
+    plt.imshow(array, cmap="hot")
     plt.axis("off")
     
     plt.tight_layout()
-    plot.ax.set_ylabel("Motion energy [-]")
+    plt.colorbar().ax.set_ylabel("Motion energy [-]")
     if save_filename:
         plt.savefig(save_filename, dpi=600)
     else:
         plt.show()
+    plt.clf()
 
 
 def extract_videos(video_name):
-    vr = Video(f"project_1/video_data/{video_name}.MP4")
-    vr.crop(slice(375+125, 1125+125), slice(50, 800))
-    # vr.plot()
-    vr.convert_to_luminosity()
+    video = Video(f"project_1/video_data/{video_name}.MP4")
+    video.crop(slice(375, 1125), slice(50, 800))
+    # video.plot()
+    video.convert_to_luminosity()
 
-    # vr = Video(f"project_1/arrays/{video_name}.npy")
-    motion_energy = vr.get_mean_motion_energy()
+    # video = Video(f"project_1/arrays/{video_name}.npy")
+    motion_energy = video.get_mean_motion_energy()
     plot(motion_energy, f"project_1/figures/{video_name}.png")
 
 
-extract_videos("upwards_plane")
+# extract_videos("empty")
+
+
+def autoextract_videos():
+    for video_name in os.listdir("project_1/video_data"):
+        print(video_name, end=" "*(40-len(video_name)))
+        video = Video(f"project_1/video_data/{video_name}")
+        with open(f"project_1/crop_slices/{video_name.split('.')[0]}.txt", "r") as f:
+            lines = f.read().split("\n")[1:]
+            x_slice = slice(int(lines[0].split("(")[1].split(",")[0]), int(lines[0].split(", ")[1].split(",")[0]))
+            y_slice = slice(int(lines[1].split("(")[1].split(",")[0]), int(lines[1].split(", ")[1].split(",")[0]))
+        video.crop(x_slice, y_slice)
+        video.convert_to_luminosity()
+
+        motion_energy = video.get_mean_motion_energy()
+        plot(motion_energy, f"project_1/figures/{video_name.split('.')[0]}.png")
+
+autoextract_videos()

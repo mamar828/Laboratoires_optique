@@ -18,7 +18,7 @@ class Video:
 
     def get_numpy_array(self, filename):
         capture = cv2.VideoCapture(filename)
-        frameCount = int(capture.get(cv2.CAP_PROP_FRAME_COUNT)) - 10
+        frameCount = int(capture.get(cv2.CAP_PROP_FRAME_COUNT))
         frameWidth = int(capture.get(cv2.CAP_PROP_FRAME_WIDTH))
         frameHeight = int(capture.get(cv2.CAP_PROP_FRAME_HEIGHT))
         
@@ -29,9 +29,11 @@ class Video:
             booli, frame = capture.read()
             if frame is not None:
                 data[frame_number] = frame
+            else:
+                break
             frame_number += 1
-        
-        return data
+
+        return data[:frame_number,:,:,:]
 
     def save(self):
         np.save(f"{self.save_foldername}/{self.filename.split('/')[-1].split('.')[0]}.npy", self.data)

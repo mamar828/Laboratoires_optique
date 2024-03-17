@@ -1,0 +1,3 @@
+project_1/video_data/centered_small_cylinder.MP4
+	x_slice: slice(525, 1275, None), 
+	y_slice: slice(50, 800, None)
