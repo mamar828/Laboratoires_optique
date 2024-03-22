@@ -57,3 +57,7 @@ class Video:
         differences = np.abs(np.diff(self.data, axis=0))
         mean = np.mean(differences, axis=0)
         return mean
+    
+    @staticmethod
+    def get_filtered_array(array, motion_energy_cutoff: int):
+        return np.where(array > motion_energy_cutoff, array, np.NAN)
