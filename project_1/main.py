@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import os
 
-from video import Video
+from project_1.video import Video
 
 
 def plot(array, save_filename=None):
@@ -19,7 +19,9 @@ def plot(array, save_filename=None):
 
 def extract_videos(video_name):
     video = Video(f"project_1/video_data/{video_name}.MP4")
-    video.crop(slice(375, 1125), slice(50, 800))
+    video.crop(slice(520-50, 1345-50), slice(5, 860))
+    # video.crop(slice(520-40, 1345-40), slice(5, 860))
+    # video.crop(slice(520, 1345), slice(5, 860))
     # video.plot()
     video.convert_to_luminosity()
 
@@ -28,7 +30,7 @@ def extract_videos(video_name):
     plot(motion_energy, f"project_1/figures/{video_name}.png")
 
 
-# extract_videos("empty")
+extract_videos("vide")
 
 
 def autoextract_videos():
@@ -45,4 +47,4 @@ def autoextract_videos():
         motion_energy = video.get_mean_motion_energy()
         plot(motion_energy, f"project_1/figures/{video_name.split('.')[0]}.png")
 
-autoextract_videos()
+# autoextract_videos()

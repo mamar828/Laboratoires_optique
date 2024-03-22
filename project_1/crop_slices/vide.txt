@@ -1,0 +1,3 @@
+project_1/video_data/vide.MP4
+	x_slice: slice(470, 1295, None), 
+	y_slice: slice(5, 860, None)

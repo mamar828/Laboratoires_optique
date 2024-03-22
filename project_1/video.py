@@ -45,7 +45,7 @@ class Video:
 
     def crop(self, x_slice, y_slice):
         self.data = self.data[:, y_slice, x_slice]
-        print(f"New dimensions: {self.data.shape[1:3]}")
+        print(f"New dimensions: {tuple(reversed(self.data.shape[1:3]))}")
         with open(f"project_1/crop_slices/{self.filename.split('/')[-1].split('.')[0]}.txt", "w") as f:
             f.write(self.filename)
             f.write(f"\n\tx_slice: {x_slice}, \n\ty_slice: {y_slice}")
