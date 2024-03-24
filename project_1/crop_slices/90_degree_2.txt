@@ -1,3 +1,3 @@
-project_1/video_data/90_degree_2.MP4
+/Users/felixdesroches/Desktop/ULaval_labs/PHY_2006_optique/Laboratoires_optique/project_1/video_data/90_degree_2.MP4
 	x_slice: slice(480, 1305, None), 
 	y_slice: slice(5, 860, None)
