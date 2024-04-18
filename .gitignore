@@ -1,3 +1,5 @@
 *.pyc
 *.DS_Store
 .vscode
+project_2/video_data_raw
+project_2/video_data

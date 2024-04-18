@@ -49,6 +49,7 @@ def autoextract_videos():
         motion_energy = video.get_mean_motion_energy()
         plot(motion_energy, f"project_1/figures/{video_name.split('.')[0]}.png")
 
+
 # autoextract_videos()
 
 
