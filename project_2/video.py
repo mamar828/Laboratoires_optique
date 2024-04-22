@@ -12,7 +12,7 @@ from tqdm import tqdm
 from time import time
 
 from project_2.spectrum import Spectrum
-from project_2.map import Map
+from project_2.map import *
 
 
 
@@ -76,9 +76,9 @@ class Video:
         self.data = self.data[:self.data.shape[0] - cropped_pixels[0], :self.data.shape[1] - cropped_pixels[1], 
                          :self.data.shape[2] - cropped_pixels[2], ...]
         if len(self.data.shape) == 4:
-            output = dtype=np.int64
+            dtype = np.int64
         else:
-            output = dtype=np.float64
+            dtype = np.float64
 
         for ax, b in enumerate(r_bins):
             if b != 1:
@@ -87,25 +87,61 @@ class Video:
                 reshaped_data = self.data.reshape(indices)
                 self.data = reshaped_data.mean(axis=ax+1, dtype=dtype)
 
-    def get_spectrum(self, x, y):
+    def get_spectrum(self, x: int, y: int, z_limit: int=None):
         assert len(self.data.shape) == 3, (
                 f"{C.RED+C.BOLD}Video must be converted to luminosity before creating a spectrum{C.END}")
         data = np.stack((np.arange(self.data.shape[0]), self.data[:,y,x]), axis=1)
-        return Spectrum(data[:150,:])
+        if z_limit:
+            return Spectrum(data[:z_limit,:])
+        else:
+            return Spectrum(data)
     
-    def fit(self) -> Map:
+    def fit(self) -> tuple[Map, Map]:
         start = time()
-        data = self.data[:150,:,:]
+        data = self.data[:155,:,:]
         with multiprocessing.Pool() as pool:
             results = []
             mapped_pool = pool.imap(worker_fit, [data[:,y,:] for y in range(data.shape[1])])
-            print(C.LIGHT_BLUE)
+            print(C.LIGHT_BLUE, end="")
             for result in tqdm(mapped_pool, total=data.shape[1], desc="Fitting"):
                 results.append(result)
-            print(C.END)
-        array = np.array(results).transpose().swapaxes(1,2)
+            print(C.END, end="")
+
+        results_array = np.array(results)
         print(f"{C.GREEN+C.BOLD}Finished fitting in {time()-start} seconds.{C.END}")
-        return Map(array)
+        output = (
+            Map(value=ValueArray(results_array[:,:,0]),
+                uncertainty=UncertaintyArray(results_array[:,:,1]), 
+                name="FWHM",
+                units="frames"),
+            Map(value=ValueArray(results_array[:,:,2]),
+                name="FWHM standard deviation",
+                units="frames")
+        )
+        return output
+    
+    def measure_peak_distances(self) -> Map:
+        start = time()
+        results = []
+        spectral_axis = np.arange(self.data.shape[0])
+        print(C.LIGHT_BLUE, end="")
+        for y in tqdm(range(self.data.shape[1]), desc="Measuring peaks"):
+            for x in range(self.data.shape[2]):
+                spec = Spectrum(np.stack((spectral_axis, self.data[:,y,x]), axis=1))
+                results.append(spec.get_peak_distance())
+        print(C.END, end="")
+
+        values = np.array(results).reshape(self.data.shape[1:])
+        uncertainties = np.zeros_like(values) + 2
+        print(f"{C.GREEN+C.BOLD}Finished measuring peaks in {time()-start} seconds.{C.END}")
+        output = Map(
+            value=ValueArray(values),
+            uncertainty=UncertaintyArray(uncertainties),
+            name="average peak distance",
+            units="frames"
+        )
+        return output
+
 
 def worker_fit(data) -> np.ndarray:
     line = []
