@@ -32,11 +32,11 @@ class Array(np.ndarray):
             cmap = ListedColormap(viridis_cmap(np.linspace(0, 1, interval)))
             norm = BoundaryNorm(bounds, cmap.N)
             imshow = plot_func.imshow(self.data, cmap=cmap, norm=norm)
-            cbar = plt.colorbar(imshow, ticks=np.linspace(*cbar_limits, interval//2 + 1))
+            cbar = plt.colorbar(imshow, ticks=np.linspace(*cbar_limits, interval//2 + 1), fraction=0.046, pad=0.04)
 
         else:
             imshow = plot_func.imshow(self.data)
-            cbar = plt.colorbar(imshow)
+            cbar = plt.colorbar(imshow, fraction=0.046, pad=0.04)
 
         if kwargs.get("cbar_limits") and not kwargs.get("discrete_colormap"):
             imshow.set_clim(*kwargs.get("cbar_limits"))
@@ -48,6 +48,7 @@ class Array(np.ndarray):
             plt.ylabel(kwargs.get("ylabel"))
         
         plot_func.tick_params(axis='both', direction='in')
+
         plt.tight_layout()
         if filename:
             plt.savefig(filename, dpi=600, bbox_inches="tight")
@@ -122,7 +123,7 @@ class Map:
         )
     
     def __getitem__(self, key: slice) -> np.ndarray:
-        return np.stack([self.value.data[key], self.uncertainty.data[key]], axis=1)
+        return np.stack([self.value[key], self.uncertainty[key]], axis=1)
     
     @property
     def shape(self):

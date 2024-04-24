@@ -1,5 +1,7 @@
-import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib import animation
+import matplotlib.pyplot as plt
+from astropy import units as u
 from time import time
 import pyregion
 
@@ -77,7 +79,9 @@ def make_spectrum_graph():
     print(spectrums[1].get_r_squared())
     spectrums[3].fit()
     print(spectrums[3].get_r_squared())
-    fig, axs = plt.subplots(4, 1, figsize=(4,7))
+    # fig, axs = plt.subplots(2, 2, figsize=(4,7))
+    fig, axs = plt.subplots(2, 2, figsize=(9,4))
+    axs = axs.T.flatten()
     for spectrum, ax, letter in zip(spectrums, axs, ["a)", "b)", "c)", "d)"]):
         spectrum.plot(ax=ax)
         ax.set_title(letter, loc="left")
@@ -86,8 +90,9 @@ def make_spectrum_graph():
     fig.supxlabel("Image vidéo [-]")
     fig.supylabel("Intensité normalisée [-]")
     plt.tight_layout()
-    # plt.savefig("project_2/figures/spectrums.png", dpi=600, bbox_inches="tight")
-    # plt.show()
+    # plt.savefig("project_2/figures/article/spectrums.png", dpi=600, bbox_inches="tight")
+    plt.savefig("project_2/figures/presentation/spectrums.png", dpi=600, bbox_inches="tight")
+    plt.show()
 
 
 # make_spectrum_graph()
@@ -97,7 +102,8 @@ def make_fwhm_peak_dists_graph():
     fwhm = Map.load("project_2/maps/fwhm.fits")
     peak_dists = Map.load("project_2/maps/peak_dists.fits")
 
-    fig, axs = plt.subplots(2, 1, figsize=(5, 7))
+    # fig, axs = plt.subplots(2, 1, figsize=(5, 7))
+    fig, axs = plt.subplots(1, 2, figsize=(9,4))
     fwhm.value.plot(ax=axs[0], cbar_label="Largeur à mi-hauteur [u. arb.]", cbar_limits=(10,50))
     peak_dists.value.plot(ax=axs[1], cbar_label="Distance moyenne entre les pics [u. arb.]", cbar_limits=(150,157),
                           discrete_colormap=True)
@@ -107,7 +113,9 @@ def make_fwhm_peak_dists_graph():
     fig.supxlabel("Position x [pixels]")
     fig.supylabel("Position y [pixels]")
     plt.tight_layout()
-    plt.savefig("project_2/figures/fwhm_peak_dists.png", dpi=600, bbox_inches="tight")
+    # plt.savefig("project_2/figures/article/fwhm_peak_dists.png", dpi=600, bbox_inches="tight")
+    fig.subplots_adjust(right=1.1)
+    plt.savefig("project_2/figures/presentation/fwhm_peak_dists.png", dpi=600, bbox_inches="tight")
     # plt.show()
 
 
@@ -117,7 +125,8 @@ def make_fwhm_peak_dists_graph():
 def make_finesse_graph():
     finesse = Map.load("project_2/maps/finesse.fits")
 
-    fig, axs = plt.subplots(2, 1, figsize=(5, 7))
+    # fig, axs = plt.subplots(2, 1, figsize=(5, 7))
+    fig, axs = plt.subplots(1, 2, figsize=(9,4))
 
     finesse.value.plot(
         ax=axs[0],
@@ -136,7 +145,9 @@ def make_finesse_graph():
     axs[0].set_title("a)", loc="left")
     axs[1].set_title("b)", loc="left")
     plt.tight_layout()
-    plt.savefig("project_2/figures/finesse.png", dpi=600, bbox_inches="tight")
+    # plt.savefig("project_2/figures/article/finesse.png", dpi=600, bbox_inches="tight")
+    fig.subplots_adjust(right=1.1)
+    plt.savefig("project_2/figures/presentation/finesse.png", dpi=600, bbox_inches="tight")
     # plt.show()
 
 
@@ -156,4 +167,66 @@ def get_stats():
     print(f"middle max finesse : {masked_finesse.value[max_i]} ± {masked_finesse.uncertainty[max_i]} at pixel {max_i}")
 
 
-get_stats()
+# get_stats()
+
+
+def make_uncertainties_graph():
+    fwhm = Map.load("project_2/maps/fwhm.fits")
+    peak_dists = Map.load("project_2/maps/peak_dists.fits")
+    finesse = Map.load("project_2/maps/finesse.fits")
+
+    fig, axs = plt.subplots(1, 3, figsize=(9,3))
+    fwhm.uncertainty.plot(ax=axs[0], cbar_label="Largeur à mi-hauteur [u. arb.]", cbar_limits=(0,2))
+    peak_dists.uncertainty.plot(ax=axs[1], cbar_label="Distance moyenne entre\nles pics [u. arb.]",
+                                cbar_limits=(1,3), discrete_colormap=True)
+    finesse.uncertainty.plot(ax=axs[2], cbar_label="Finesse [-]", cbar_limits=(0.1,0.7))
+
+    axs[0].set_title("a)", loc="left")
+    axs[1].set_title("b)", loc="left")
+    axs[2].set_title("c)", loc="left")
+    fig.supxlabel("Position x [pixels]")
+    fig.supylabel("Position y [pixels]")
+    fig.subplots_adjust(right=1.02)
+    plt.tight_layout()
+    plt.savefig("project_2/figures/presentation/uncertainties.png", dpi=600, bbox_inches="tight")
+    # plt.show()
+
+
+# make_uncertainties_graph()
+
+
+def make_bad_spectrums_graph():
+    vid = Video.load("project_2/video_data/MVI_9147.gz")
+    y_start = 170
+    x_space = np.linspace(0, 155, 1500)
+    specs = [vid.get_spectrum(200, y, 155) for y in range(y_start,y_start+200)]
+    for spec in specs:
+        spec.fit()
+    fwhms = [spec.get_FWHM() for spec in specs]
+
+    fig, ax = plt.subplots(1, 1, figsize=(9,4))
+    ax.set_ylim(-0.1,1)
+    ax.set_xlabel("Position x [pixels]")
+    ax.set_ylabel("Position y [pixels]")
+    plot, = ax.plot(specs[0].data[:,0], specs[0].data[:,1], "o", color="silver", markersize=1.5)
+    fit, = ax.plot(x_space, specs[0].fitted_function(x_space*u.um)/u.Jy, "o", color="black", markersize=1.5)
+    title = ax.set_title(f"Spectre de la coordonnée : (200,{y_start})                         "
+                       + f"Largeur à mi-hauteur : ({round(fwhms[0][0], 1)} ± {round(fwhms[0][1], 1)}) [u. arb.]",
+                         loc="left")
+
+    def update(i):
+        plot.set_ydata(specs[i].data[:,1])
+        fit.set_ydata(specs[i].fitted_function(x_space*u.um)/u.Jy)
+        title.set_text(f"Spectre de la coordonnée : (200,{y_start+i})                         "
+                     + f"Largeur à mi-hauteur : ({round(fwhms[i][0], 1)} ± {round(fwhms[i][1], 1)}) [u. arb.]")
+        return plot,
+
+    fig.tight_layout()
+    animated_plot = animation.FuncAnimation(fig, update, repeat=True, frames=len(specs), interval=100,
+                                            repeat_delay=1000)
+
+    animated_plot.save('project_2/figures/presentation/animation.gif', writer='imagemagick', dpi=300)
+    # plt.show()
+
+
+# make_bad_spectrums_graph()
