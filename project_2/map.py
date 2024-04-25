@@ -13,9 +13,6 @@ class Array(np.ndarray):
         obj = np.asarray(data).view(cls)
         return obj
 
-    def __init__(self, data):
-        self.data = data
-
     def plot(self, filename=None, ax=None, **kwargs):
         if ax:
             plot_func = ax
